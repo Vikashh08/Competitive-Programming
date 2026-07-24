@@ -10,41 +10,34 @@
  */
 class Solution {
 public:
-    void reorderList(ListNode* head) {
-        if (!head || !head->next) return;
+    struct cmp {
+        bool operator()(ListNode* a, ListNode* b) {
+            return a->val > b->val;
+        }
+    };
 
-        // Step 1: Find the middle
-        ListNode *slow = head, *fast = head;
-        while (fast->next && fast->next->next) {
-            slow = slow->next;
-            fast = fast->next->next;
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        priority_queue<ListNode*, vector<ListNode*>, cmp> pq;
+
+        for (auto node : lists) {
+            if (node)
+                pq.push(node);
         }
 
-        // Step 2: Reverse the second half
-        ListNode *prev = nullptr;
-        ListNode *curr = slow->next;
-        slow->next = nullptr;
+        ListNode dummy(0);
+        ListNode* tail = &dummy;
 
-        while (curr) {
-            ListNode *nextNode = curr->next;
-            curr->next = prev;
-            prev = curr;
-            curr = nextNode;
+        while (!pq.empty()) {
+            ListNode* node = pq.top();
+            pq.pop();
+
+            tail->next = node;
+            tail = tail->next;
+
+            if (node->next)
+                pq.push(node->next);
         }
 
-        // Step 3: Merge the two halves
-        ListNode *first = head;
-        ListNode *second = prev;
-
-        while (second) {
-            ListNode *temp1 = first->next;
-            ListNode *temp2 = second->next;
-
-            first->next = second;
-            second->next = temp1;
-
-            first = temp1;
-            second = temp2;
-        }
+        return dummy.next;
     }
 };
